@@ -1,0 +1,9 @@
+[] RF1 - Criar um novo *todo*;
+[] RF2 - Listar todos os *todos*;
+[] RF3 - Alterar o `title` e `deadline` de um *todo* existente;
+[] RF4 - Marcar um *todo* como feito;
+[] RF5 - Excluir um *todo*;
+
+
+RN1 - Será permitida a criação de um usuário com name e username
+RN2 - o `username` será passado pelo header
