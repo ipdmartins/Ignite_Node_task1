@@ -16,7 +16,7 @@ function checksExistsUserAccount(request, response, next) {
   const user = users.find((users) => users.username === username);
 
   if (!user) {
-    return response.status(400).json({ error: "User not found" });
+    return response.status(404).json({ error: "User not found" });
   }
 
   request.user = user;
@@ -25,6 +25,12 @@ function checksExistsUserAccount(request, response, next) {
 }
 
 app.post("/users", (request, response) => {
+  const existentUsername = users.find(user => user.username === request.body.username);
+
+  if(existentUsername){
+    return response.status(400).json({ error: "Username already exists" });
+  }
+
   const newUser = {
     id: uuidv4(),
     name: request.body.name,
@@ -56,13 +62,19 @@ app.post("/todos", checksExistsUserAccount, (request, response) => {
 
   user.todos.push(newTodos);
 
-  return response.status(200).json(user.todos);
+  return response.status(201).json(user.todos);
 });
 
 app.put("/todos/:id", checksExistsUserAccount, (request, response) => {
   const { user } = request;
 
   const { id } = request.params;
+
+  const foundTodo = user.todos.find(todos => todos.id === id);
+
+  if(!foundTodo){
+    return response.status(404).json({ error: "Task does not exists" });
+  }
 
   const userUpdate = user.todos.map((tasks) => {
     if (tasks.id === id) {
@@ -87,6 +99,12 @@ app.patch("/todos/:id/:done", checksExistsUserAccount, (request, response) => {
 
   const { id, done } = request.params;
 
+  const foundTodo = user.todos.find(todos => todos.id === id);
+
+  if(!foundTodo){
+    return response.status(404).json({ error: "Task does not exists" });
+  }
+
   const userUpdate = user.todos.map((tasks) => {
     if (tasks.id === id) {
       return {
@@ -110,11 +128,17 @@ app.delete("/todos/:id", checksExistsUserAccount, (request, response) => {
 
   const { id } = request.params;
 
+  const foundTodo = user.todos.find(todos => todos.id === id);
+
+  if(!foundTodo){
+    return response.status(404).json({ error: "Task does not exists" });
+  }
+
   const index = user.todos.findIndex(tasks => tasks.id === id);
 
   user.todos.splice(index);
 
-  return response.status(200).json(user.todos);
+  return response.status(204);
 });
 
 module.exports = app;
