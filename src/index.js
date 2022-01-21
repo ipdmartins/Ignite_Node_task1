@@ -64,7 +64,7 @@ app.post("/todos", checksExistsUserAccount, (request, response) => {
 
   user.todos.push(newTodos);
 
-  return response.status(201).json(user.todos);
+  return response.status(201).json(newTodos);
 });
 
 app.put("/todos/:id", checksExistsUserAccount, (request, response) => {
@@ -78,22 +78,24 @@ app.put("/todos/:id", checksExistsUserAccount, (request, response) => {
     return response.status(404).json({ error: "Task does not exists" });
   }
 
+  let updated;
   const userUpdate = user.todos.map((tasks) => {
     if (tasks.id === id) {
-      return {
+      updated = {
         id,
         title: request.body.title,
         done: tasks.done,
         deadline: request.body.deadline,
         created_at: tasks.created_at,
       };
+      return updated;
     }
     return tasks;
   });
 
   user.todos = userUpdate;
 
-  return response.status(200).json(user.todos);
+  return response.status(200).json(updated);
 });
 
 app.patch("/todos/:id/:done", checksExistsUserAccount, (request, response) => {
@@ -107,22 +109,24 @@ app.patch("/todos/:id/:done", checksExistsUserAccount, (request, response) => {
     return response.status(404).json({ error: "Task does not exists" });
   }
 
+  let updated;
   const userUpdate = user.todos.map((tasks) => {
     if (tasks.id === id) {
-      return {
+      updated = {
         id,
         title: tasks.title,
         done: Boolean(done),
         deadline: tasks.deadline,
         created_at: tasks.created_at,
       };
+      return updated;
     }
     return tasks;
   });
 
   user.todos = userUpdate;
 
-  return response.status(200).json(user.todos);
+  return response.status(200).json(updated);
 });
 
 app.delete("/todos/:id", checksExistsUserAccount, (request, response) => {
@@ -140,7 +144,7 @@ app.delete("/todos/:id", checksExistsUserAccount, (request, response) => {
 
   user.todos.splice(index);
 
-  return response.status(204).json({ message: "User successfully deleted" });
+  return response.status(204).send();
 });
 
 module.exports = app;
